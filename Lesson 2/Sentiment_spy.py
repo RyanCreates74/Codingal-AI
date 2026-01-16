@@ -73,4 +73,3 @@ while True:
     # Print result with color, emojis, and polarity
     print(f"{color}{emoji} {sentiment_type} sentiment detected! "
           f"(Polarity: {polarity:.2f}){Style.RESET_ALL}")
-
