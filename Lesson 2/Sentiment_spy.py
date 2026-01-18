@@ -4,11 +4,15 @@ from textblob import TextBlob
 
 colorama.init()
 
+positive_sentences = 0
+negative_sentences = 0
+neutral_sentences = 0
+
 print(f"{Fore.CYAN}💫🕵️‍♂️ Welcome to Sentiment Spy! 🪄{Style.RESET_ALL}")
 
 user_name = input(f"{Fore.MAGENTA}Please enter your name: {Style.RESET_ALL}").strip()
 if not user_name:
-    user_name = "Myster Agent"
+    user_name = "Mystery Agent"
 
 conversation_history = []
 
@@ -26,6 +30,7 @@ while True:
     
     if user_input.lower() == "exit":
         print(f"\n{Fore.BLUE}🛰️ Exiting Sentiment Spy. Farewell, Agent {user_name}! 🧩{Style.RESET_ALL}")
+        print(f"Mission Report: \n Positive Sentences = {positive_sentences} \n Negative Sentences = {negative_sentences} \n Neutral Sentences = {neutral_sentences}")
         break
 
     elif user_input.lower() == "reset":
@@ -52,6 +57,7 @@ while True:
 
                 print(f"{idx}. {color}{emoji} {text} "
                       f"(Polarity: {polarity:.2f}, {sentiment_type}){Style.RESET_ALL}")
+            print(f"Mission Report: \n Positive Sentences = {positive_sentences} \n Negative Sentences = {negative_sentences} \n Neutral Sentences = {neutral_sentences}")
         continue
 
     polarity = TextBlob(user_input).sentiment.polarity
@@ -59,14 +65,17 @@ while True:
         sentiment_type = "Positive"
         color = Fore.GREEN
         emoji = "😊"
+        positive_sentences += 1
     elif polarity < -0.25:
         sentiment_type = "Negative"
         color = Fore.RED
         emoji = "😞"
+        negative_sentences += 1
     else:
         sentiment_type = "Neutral"
         color = Fore.YELLOW
         emoji = "😐"
+        neutral_sentences += 1
 
         conversation_history.append((user_input, polarity, sentiment_type))
 
