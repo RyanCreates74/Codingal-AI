@@ -21,39 +21,49 @@ def load_data(file_path='imdb_top_1000.csv'):
 
 movies_df = load_data()
 
-# Vectorize combined features and compute cosine similarity
+# Vectorize combined features and compute cosine similarity (kept for future upgrades)
 tfidf = TfidfVectorizer(stop_words='english')
 tfidf_matrix = tfidf.fit_transform(movies_df['combined_features'])
 cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 
-# Function to recommend movies based on similarity, mood, and rating
-def recommend_movies(genre=None, mood=None, rating=None, top_n=5):
-    if genre:
-        genre_movies = movies_df[movies_df['Genre'].str.contains(genre, case=False, na=False)]
+# Function to recommend movies based on genre, mood, rating, or randomness
+def recommend_movies(genre=None, mood=None, rating=None, top_n=5, random_pick=False):
+
+    # Genre or random selection
+    if random_pick:
+        filtered_movies = movies_df.copy()
+    elif genre:
+        filtered_movies = movies_df[movies_df['Genre'].str.contains(genre, case=False, na=False)]
     else:
-        genre_movies = movies_df
+        filtered_movies = movies_df
 
+    # Rating filter
     if rating:
-        genre_movies = genre_movies[genre_movies['IMDB_Rating'] >= rating]
+        filtered_movies = filtered_movies[filtered_movies['IMDB_Rating'] >= rating]
 
-    if genre_movies.empty:
-        return f"No movies found for genre '{genre}' with that rating range."
+    if filtered_movies.empty:
+        return "No movies found with the selected preferences."
 
-    # Sentiment filtering using mood polarity
-    if mood:
+    # Mood-based sorting (not applied for random picks)
+    if mood and not random_pick:
         polarity = TextBlob(mood).sentiment.polarity
         if polarity > 0:
-            genre_movies = genre_movies.sort_values(by='IMDB_Rating', ascending=False)
+            filtered_movies = filtered_movies.sort_values(by='IMDB_Rating', ascending=False)
         elif polarity < 0:
-            genre_movies = genre_movies.sort_values(by='IMDB_Rating', ascending=True)
+            filtered_movies = filtered_movies.sort_values(by='IMDB_Rating', ascending=True)
 
-    top_movies = genre_movies.head(top_n)
+    # Random or ranked results
+    if random_pick:
+        top_movies = filtered_movies.sample(n=min(top_n, len(filtered_movies)))
+    else:
+        top_movies = filtered_movies.head(top_n)
+
     return top_movies[['Series_Title', 'Genre', 'IMDB_Rating']]
 
 # Display movie recommendations
 def display_recommendations(recs, name):
     print(Fore.CYAN + f"\n🎥 Movie Recommendations for {name}:\n")
-    for i, row in recs.iterrows():
+    for _, row in recs.iterrows():
         print(Fore.GREEN + f"{row['Series_Title']} ({row['Genre']}) - ⭐ {row['IMDB_Rating']}")
     print()
 
@@ -66,7 +76,13 @@ def processing_animation():
 
 # Handle AI logic
 def handle_ai(name):
-    genre = input(Fore.YELLOW + "Enter a movie genre (e.g., Action, Comedy, Drama): ").strip()
+    genre_input = input(
+        Fore.YELLOW +
+        "Enter a movie genre (e.g., Action, Comedy, Drama) or type 'random': "
+    ).strip()
+
+    random_pick = genre_input.lower() == 'random'
+    genre = None if random_pick else genre_input
 
     mood = input(Fore.YELLOW + "How are you feeling today? (Describe your mood): ").strip()
     print(Fore.BLUE + "\nAnalyzing mood", end="", flush=True)
@@ -76,7 +92,7 @@ def handle_ai(name):
     mood_desc = "positive 😊" if polarity > 0 else "negative 😞" if polarity < 0 else "neutral 😐"
     print(f"{Fore.GREEN}Your mood is {mood_desc} (Polarity: {polarity:.2f})\n")
 
-    # Ask for minimum IMDB_Rating
+    # Ask for minimum IMDB rating
     while True:
         rating_input = input(Fore.YELLOW + "Enter minimum IMDB_Rating (7.6–9.3) or 'skip': ").strip()
         if rating_input.lower() == 'skip':
@@ -93,7 +109,14 @@ def handle_ai(name):
     print(Fore.BLUE + f"\nFinding movies for {name}", end="", flush=True)
     processing_animation()
 
-    recs = recommend_movies(genre=genre, mood=mood, rating=rating, top_n=5)
+    recs = recommend_movies(
+        genre=genre,
+        mood=mood,
+        rating=rating,
+        top_n=5,
+        random_pick=random_pick
+    )
+
     if isinstance(recs, str):
         print(Fore.RED + recs + "\n")
     else:
@@ -101,12 +124,18 @@ def handle_ai(name):
 
     # Option for more recommendations
     while True:
-        action = input(Fore.YELLOW + "\nWould you like more recommendations? (yes/no): ").strip().lower()
-        if action == 'no':
+        random_choice = input(Fore.YELLOW + "\nWould you like more recommendations? (yes/no): ").strip().lower()
+        if random_choice.lower() == 'no':
             print(Fore.GREEN + f"\nEnjoy your movie picks, {name}! 🍿🎬\n")
             break
-        elif action == 'yes':
-            recs = recommend_movies(genre=genre, mood=mood, rating=rating, top_n=5)
+        elif random_choice.lower() == 'yes':
+            recs = recommend_movies(
+                genre=genre,
+                mood=mood,
+                rating=rating,
+                top_n=5,
+                random_pick=random_pick
+            )
             if isinstance(recs, str):
                 print(Fore.RED + recs + "\n")
             else:
