@@ -1,0 +1,38 @@
+import cv2
+image = cv2.imread('OpenCV_Image.jpg')
+grey_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+resized_image1 = cv2.resize(grey_image, (224,224))
+cv2.imshow('Processed Image', resized_image1)
+key = cv2.waitKey(0)
+if key == ord('s'):
+    cv2.imwrite('greyscale_resized_image.jpg', resized_image1)
+    print('Image saved as greyscale_resized_image.jpg')
+else:
+    print('Image not saved')
+
+cv2.destroyAllWindows()
+print(f"Processed Image Dimensions: {resized_image1.shape}")
+
+resized_image2 = cv2.resize(grey_image, (112,224))
+cv2.imshow('Processed Image', resized_image2)
+key = cv2.waitKey(0)
+if key == ord('s'):
+    cv2.imwrite('greyscale_resized_image.jpg', resized_image2)
+    print('Image saved as greyscale_resized_image.jpg')
+else:
+    print('Image not saved')
+
+cv2.destroyAllWindows()
+print(f"Processed Image Dimensions: {resized_image2.shape}")
+
+resized_image3 = cv2.resize(grey_image, (448,224))
+cv2.imshow('Processed Image', resized_image3)
+key = cv2.waitKey(0)
+if key == ord('s'):
+    cv2.imwrite('greyscale_resized_image.jpg', resized_image3)
+    print('Image saved as greyscale_resized_image.jpg')
+else:
+    print('Image not saved')
+
+cv2.destroyAllWindows()
+print(f"Processed Image Dimensions: {resized_image3.shape}")
