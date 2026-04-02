@@ -11,7 +11,7 @@ def build_api_url(model_name):
 
 def query(payload, model_name=DEFAULT_MODEL):
     api_url = build_api_url(model_name)
-    headers = {"Authorisation": f"Bearer {HF_API_KEY}"}
+    headers = {"Authorization": f"Bearer {HF_API_KEY}"}
     response = requests.post(api_url, headers=headers, json=payload)
     return response.json()
 
