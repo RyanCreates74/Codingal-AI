@@ -3,9 +3,9 @@ import pyttsx3
 from googletrans import Translator
 
 def speak(text, language="en"):
-    engine = pyttsx3
+    engine = pyttsx3.init()
     engine.setProperty('rate', 150)
-    voices = engine.getProperty
+    voices = engine.getProperty('voices')
 
     if language == "en":
         engine.setProperty('voice', voices[0].id)
