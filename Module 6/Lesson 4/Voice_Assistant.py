@@ -1,45 +1,71 @@
 import speech_recognition as sr
 import pyttsx3
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 
-def speak(text, language="en"):
-    engine = pyttsx3.init()
-    engine.setProperty('rate', 150)
+# Initialize TTS engine once
+engine = pyttsx3.init('sapi5')
+
+def setup_voice(language="en"):
     voices = engine.getProperty('voices')
 
+    for i, v in enumerate(voices):
+        print(i, v.name)
+
+    # Try to select a suitable voice
     if language == "en":
         engine.setProperty('voice', voices[0].id)
     else:
-        engine.setProperty('voice', voices[1].id)
+        if len(voices) > 1:
+            engine.setProperty('voice', voices[1].id)
+        else:
+            engine.setProperty('voice', voices[0].id)
 
+    engine.setProperty('rate', 150)
+
+
+def speak(text, language="en"):
+    setup_voice(language)
+    print(f"🔊 Speaking: {text}")
     engine.say(text)
     engine.runAndWait()
 
+
 def speech_to_text():
     recognizer = sr.Recognizer()
-    with sr.Microphone() as source:
-        print("🎤 Please speak now in English...")
-        audio = recognizer.listen(source)
 
     try:
-        print("🔍 Recognizing speech...")
+        with sr.Microphone() as source:
+            print("🎤 Please speak now...")
+            recognizer.adjust_for_ambient_noise(source)
+            audio = recognizer.listen(source)
+
+        print("🔎 Recognizing...")
         text = recognizer.recognize_google(audio, language="en-US")
         print(f"✅ You said: {text}")
         return text
+
     except sr.UnknownValueError:
-        print("❌ Could not understand the audio.")
+        print("❌ Could not understand audio")
     except sr.RequestError as e:
-        print(f"❌ API Error: {e}")
+        print(f"❌ API error: {e}")
+    except Exception as e:
+        print(f"❌ Error: {e}")
+
     return ""
 
-def translate_text(text, target_language="es"):  # Default target language is Spanish (es)
-    translator = Translator()
-    translation = translator.translate(text, dest=target_language)
-    print(f"🌍 Translated text: {translation.text}")
-    return translation.text
+
+def translate_text(text, target_language):
+    try:
+        translated = GoogleTranslator(source='auto', target=target_language).translate(text)
+        print(f"🌍 Translated text: {translated}")
+        return translated
+    except Exception as e:
+        print(f"❌ Translation error: {e}")
+        return ""
+
 
 def display_language_options():
-    print("🌍 Available translation languages: ")
+    print("\n🌐 Select target language:")
     print("1. Hindi (hi)")
     print("2. Tamil (ta)")
     print("3. Telugu (te)")
@@ -49,10 +75,8 @@ def display_language_options():
     print("7. Malayalam (ml)")
     print("8. Punjabi (pa)")
     print("9. French (fr)")
-    print("10: Italian (it)")
-    print("11: Indonesian (id)")
 
-    choice = input("Please select the target language number (1-11): ")
+    choice = input("Enter choice (1-9): ")
 
     language_dict = {
         "1": "hi",
@@ -63,21 +87,27 @@ def display_language_options():
         "6": "gu",
         "7": "ml",
         "8": "pa",
-        "9": "fr",
-        "10": "it",
-        "11": "id"
+        "9": "fr"
     }
 
-    return language_dict.get(choice, 'es')
+    return language_dict.get(choice, "en")
+
 
 def main():
     target_language = display_language_options()
+
     original_text = speech_to_text()
 
-    if original_text:
-        translated_text = translate_text(original_text, target_language=target_language)
-        speak(translated_text, language="en")
-        print("✅ Translation spoken out!")
+    if not original_text:
+        print("⚠️ No speech detected.")
+        return
+
+    translated_text = translate_text(original_text, target_language)
+
+    if translated_text:
+        speak(translated_text, language=target_language)
+        print("✅ Done!")
+
 
 if __name__ == "__main__":
     main()
