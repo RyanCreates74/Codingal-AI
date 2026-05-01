@@ -1,12 +1,15 @@
 import speech_recognition as sr
 import pyttsx3
 from datetime import datetime
+import webbrowser
+import os
+import pyjokes
 
 def speak(text):
     engine = pyttsx3.init()
     engine.setProperty('rate', 150)
     engine.say(text)
-    engine.runAndWait
+    engine.runAndWait()
 
 
 def get_audio():
@@ -40,17 +43,22 @@ def respond_to_command(command):
     elif "time" in command:
         now = datetime.now().strftime("%H:%M")
         speak(f"The time is {now}")
+    elif "google" in command:
+        webbrowser.open("google.com")
+    elif "joke" in command:
+        joke = pyjokes.get_joke()
+        print(joke)
+        speak(joke)
     elif "exit" in command or "stop" in command:
         speak("Goodbye!")
-        return False
+        quit()
 
 
 def main():
     speak("Voice assistant activated. Say something!")
     while True:
         command = get_audio()
-        if command and not respond_to_command(command):
-            break
+        respond_to_command(command)
 
 if __name__ == "__main__":
     main()
