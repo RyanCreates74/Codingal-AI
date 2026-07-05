@@ -1,4 +1,5 @@
 from hf import generate_response
+import time
 
 def get_essay_details():
     print("\n=== AI Writing Assistant ===\n")
@@ -26,7 +27,7 @@ def generate_essay_content(details):
     intro_p = f"Write an introduction for an {details['essay_type']} essay about {details['topic']} on the topic of {details['length']}."
     intro = generate_response(intro_p, temperature=temp, max_tokens=1024)
     print("\n=== Generated Introduction ===\n")
-    print(intro)
+    pseudo_stream(intro)
 
     print("\nWould you like the body written as a full draft or step-by-step?")
     print("1) Full draft\n2) Step-by-step")
@@ -35,17 +36,23 @@ def generate_essay_content(details):
     if choice == "1":
         body_p = f"Write a full body for an essay on {details['topic']} with the stance of {details['target_audience']}."
         body = generate_response(body_p, temperature=temp, max_tokens=1024)
-        print(body)
+        pseudo_stream(body)
     else:
         step_p = f"Write step-by-step arguments for an essay on {details['topic']}. Provide evidence and reasoning."
         body_step = generate_response(step_p, temperature=temp, max_tokens=1024)
         print("\n=== Generated Step-by-Step Body ===\n")
-        print(body_step)
+        pseudo_stream(body_step)
     
     concl_p = f"Write a conclusion for an {details['essay_type']} essay about {details['topic']} with the stance of {details['target_audience']}."
     concl = generate_response(concl_p, temperature=temp, max_tokens=1024)
     print("\n=== Generated Conclusion ===\n")
-    print(concl)
+    pseudo_stream(concl)
+
+def pseudo_stream(text, delay=0.013):
+    for ch in text:
+        print(ch, end="", flush=True)
+        time.sleep(delay)
+    print()
 
 def feedback_and_refinement():
     try:
