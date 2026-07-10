@@ -1,4 +1,4 @@
-import config as Config
+import configs as Config
 from openai import OpenAI
 
 GROQ_URL = "https://api.groq.com/openai/v1"

@@ -1,4 +1,4 @@
-import config as Config
+import configs as Config
 from huggingface_hub import InferenceClient
 
 MODELS = getattr(
