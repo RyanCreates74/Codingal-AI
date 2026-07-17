@@ -1,4 +1,7 @@
+# main.py (Streamlit)
+# Switch provider by changing the import line:
 from hf import generate_response
+# from groq import generate_response
 
 import io
 import streamlit as st
@@ -20,11 +23,11 @@ CSS = """
 """
 
 def export_bytes(history):
-    text = "".join([f"Q{i}: {h['question']}\nA{i}: {h['answer']}\n\n" for i, h in enumerate[history, 1]])
+    text = "".join([f"Q{i}: {h['question']}\nA{i}: {h['answer']}\n\n" for i, h in enumerate(history, 1)])
     return io.BytesIO(text.encode("utf-8"))
 
 def setup_ui():
-    st.set_page_config(page_title="AI Teaching Assistant", layout="centred")
+    st.set_page_config(page_title="AI Teaching Assistant", layout="centered")
     st.title("🤖 AI Teaching Assistant")
     st.write("Ask me anything about various subjects, and I'll provide an insightful answer.")
     st.session_state.setdefault("history", [])
@@ -37,13 +40,13 @@ def setup_ui():
     with col_export:
         if st.session_state.history:
             st.download_button(
-                label = "📤 Export Chat History",
+                label="📤 Export Chat History",
                 data=export_bytes(st.session_state.history),
                 file_name="AI_Teaching_Assistant_Conversation.txt",
                 mime="text/plain",
             )
 
-    user_input = st.text_input("Enter your questiom here:")
+    user_input = st.text_input("Enter your question here:")
     if st.button("Ask"):
         q = user_input.strip()
         if q:
@@ -53,8 +56,8 @@ def setup_ui():
             st.rerun()
         else:
             st.warning("⚠️ Please enter a question before clicking Ask.")
-        
-    st.markdown("### Conversaion History")
+
+    st.markdown("### Conversation History")
     st.markdown(CSS, unsafe_allow_html=True)
 
     cards = []
