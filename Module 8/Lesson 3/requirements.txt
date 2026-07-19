@@ -1,0 +1,11 @@
+streamlit
+
+Huggingface_hub
+
+groq
+
+python-dotenv
+
+openai
+
+configparser

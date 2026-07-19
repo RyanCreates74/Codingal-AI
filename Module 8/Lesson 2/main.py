@@ -24,11 +24,11 @@ def export_bytes(history):
     return io.BytesIO(text.encode("utf-8"))
 
 def setup_ui():
-    st.set_page_config(page_title="AI Teaching Assistant", layout="centred")
+    st.set_page_config(page_title="AI Teaching Assistant", layout="centered")
     st.title("🤖 AI Teaching Assistant")
     st.write("Ask me anything about various subjects, and I'll provide an insightful answer.")
     st.session_state.setdefault("history", [])
-
+    
     col_clear, col_export = st.columns([1, 2])
     with col_clear:
         if st.button("🧹 Clear Conversation"):
