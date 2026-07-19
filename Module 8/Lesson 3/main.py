@@ -33,7 +33,7 @@ def setup_ui():
 
     c1, c2 = st.columns([1, 2])
     if c1.button("🗑️ Clear"):
-        st.session_state.history() = []; st.rerun()
+        st.session_state.history = []; st.rerun()
 
     if st.session_state.history:
         c2.download_button("📄 Export", export_txt(st.session_state.history),
